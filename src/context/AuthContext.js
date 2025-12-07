@@ -85,6 +85,26 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('adminUser');
   };
 
+  const fetchMedicines = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/medicines`);
+      const data = await res.json();
+      const formattedMedicines = data.map(med => ({
+        id: med._id,
+        name: med.name,
+        description: med.description,
+        price: med.price,
+        stock: med.quantity,
+        category: med.category,
+        image: med.image
+      }));
+      setMedicines(formattedMedicines);
+    } catch (error) {
+      console.error('Error fetching medicines:', error);
+    }
+  };
+
   const getStockAlerts = () => {
     return medicines.filter(medicine => medicine.stock < 20);
   };
@@ -95,6 +115,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     medicines,
     setMedicines,
+    fetchMedicines,
     pharmacists,
     setPharmacists,
     orders,

@@ -22,28 +22,43 @@ export const registerUser=async (req, res)=>{
 //Login user
 export const loginUser=async (req, res)=>{
     try{
-        const{email, password}=req.body;
-        //find user by email
-        const user = await User.findOne({email});
-        if(!user){
-            return res.status(400).json({message:"Email or Password not correct!"});
+        const{email, password, role}=req.body;
+        
+        // Handle hardcoded admin login
+        if(email === 'admin@pharmacy.com' && password === 'admin123'){
+            const token = jwt.sign(
+                {id:'admin', role:'admin'},
+                process.env.JWT_SECRET || 'fallback-secret',
+                {expiresIn:"1d"}
+            );
+            return res.status(200).json({
+                message:"Login successful",
+                token,
+                user:{id:'admin', name:'Admin', email:'admin@pharmacy.com', role:'admin'},
+            });
         }
-        //checking passwords
-        const isMatch=await user.comparePassword(password);
-        if(!isMatch){
-            return res.status(400).json({message:"Email or Password not correct!"});
+        
+        // Handle hardcoded pharmacist logins
+        const pharmacists = [
+            {email: 'sarah@pharmacy.com', name: 'Dr. Sarah Johnson'},
+            {email: 'michael@pharmacy.com', name: 'Dr. Michael Chen'}
+        ];
+        
+        const pharmacist = pharmacists.find(p => p.email === email);
+        if(pharmacist && password === 'pharmacist123'){
+            const token = jwt.sign(
+                {id:pharmacist.email, role:'pharmacist'},
+                process.env.JWT_SECRET || 'fallback-secret',
+                {expiresIn:"1d"}
+            );
+            return res.status(200).json({
+                message:"Login successful",
+                token,
+                user:{id:pharmacist.email, name:pharmacist.name, email:pharmacist.email, role:'pharmacist'},
+            });
         }
-        //generate JWT token
-        const token = jwt.sign(
-            {id:user._id, role:user.role},
-            process.env.JWT_SECRET,
-            {expiresIn:"1d"}
-        );
-        res.status(200).json({
-            message:"Login successful",
-            token,
-            user:{id:user._id, name:user.name, email:user.email, role:user.role},
-        });
+        
+        return res.status(400).json({message:"Invalid credentials"});
     }catch(error){
         console.error(error);
         res.status(500).json({message:"Server error"});

@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import StockAlerts from '../components/StockAlerts';
+import ModernAlert from '../components/ModernAlert';
 import './Dashboard.css';
 
 const PharmacistDashboard = () => {
-  const { medicines, setMedicines, orders, getStockAlerts, user, logout } = useAuth();
+  const { medicines, setMedicines, orders, setOrders, getStockAlerts, user, logout, fetchMedicines } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -22,6 +23,39 @@ const PharmacistDashboard = () => {
     category: 'Pain Relief',
     image: '',
   });
+  const [alertConfig, setAlertConfig] = useState({ isOpen: false });
+
+  // Fetch orders from backend
+  const fetchOrders = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/purchases`);
+      if (response.ok) {
+        const data = await response.json();
+        const formattedOrders = data.map(purchase => ({
+          id: purchase._id,
+          medicineName: purchase.medicineName,
+          customerName: purchase.customerName,
+          customerEmail: purchase.customerEmail,
+          customerPhone: purchase.customerPhone,
+          customerAddress: purchase.customerAddress,
+          quantity: purchase.quantity,
+          totalPrice: purchase.totalPrice,
+          status: purchase.status,
+          prescription: purchase.prescription
+        }));
+        setOrders(formattedOrders);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  };
+
+  // Fetch data on component mount
+  React.useEffect(() => {
+    fetchMedicines();
+    fetchOrders();
+  }, []);
 
   const alerts = getStockAlerts();
 
@@ -50,41 +84,44 @@ const PharmacistDashboard = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
     
-    if (editingMedicine) {
-      // Update existing medicine
-      setMedicines(prev =>
-        prev.map(m =>
-          m.id === editingMedicine.id
-            ? {
-                ...m,
-                name: formData.name,
-                description: formData.description,
-                price: parseFloat(formData.price),
-                stock: parseInt(formData.stock),
-                category: formData.category,
-                image: formData.image || m.image,
-              }
-            : m
-        )
-      );
-    } else {
-      // Add new medicine
-      const newMedicine = {
-        id: Date.now(),
-        name: formData.name,
-        description: formData.description,
-        price: parseFloat(formData.price),
-        stock: parseInt(formData.stock),
-        category: formData.category,
-        image: formData.image || 'https://via.placeholder.com/300x200/228B22/FFFFFF?text=Medicine',
-      };
-      setMedicines(prev => [...prev, newMedicine]);
+    try {
+      if (editingMedicine) {
+        await fetch(`${apiUrl}/api/medicines/${editingMedicine.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            description: formData.description,
+            price: parseFloat(formData.price),
+            stock: parseInt(formData.stock),
+            category: formData.category,
+            image: formData.image
+          })
+        });
+      } else {
+        await fetch(`${apiUrl}/api/medicines`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            description: formData.description,
+            price: parseFloat(formData.price),
+            stock: parseInt(formData.stock),
+            category: formData.category,
+            image: formData.image || 'https://via.placeholder.com/300x200/228B22/FFFFFF?text=Medicine'
+          })
+        });
+      }
+      
+      fetchMedicines();
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error saving medicine:', error);
     }
-
-    handleCloseModal();
   };
 
   const handleEdit = (medicine) => {
@@ -99,9 +136,17 @@ const PharmacistDashboard = () => {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this medicine?')) {
-      setMedicines(prev => prev.filter(m => m.id !== id));
+      try {
+        const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+        await fetch(`${apiUrl}/api/medicines/${id}`, {
+          method: 'DELETE'
+        });
+        fetchMedicines();
+      } catch (error) {
+        console.error('Error deleting medicine:', error);
+      }
     }
   };
 
@@ -115,6 +160,54 @@ const PharmacistDashboard = () => {
       stock: '',
       category: 'Pain Relief',
       image: '',
+    });
+  };
+
+  const updateOrderStatus = (orderId, newStatus) => {
+    const statusMessages = {
+      confirmed: { title: 'Confirm Order', message: 'Are you sure you want to confirm this order?' },
+      delivered: { title: 'Mark as Delivered', message: 'Are you sure this order has been delivered?' },
+      failed: { title: 'Mark as Failed', message: 'Are you sure you want to mark this order as failed?' }
+    };
+    
+    setAlertConfig({
+      isOpen: true,
+      type: 'confirm',
+      title: statusMessages[newStatus].title,
+      message: statusMessages[newStatus].message,
+      onConfirm: () => {
+        const statusText = newStatus === 'confirmed' ? 'confirmed' : newStatus === 'delivered' ? 'delivered' : 'failed';
+        
+        // Update order status in backend
+        const updateBackend = async () => {
+          try {
+            const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+            await fetch(`${apiUrl}/api/purchases/${orderId}/status`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: newStatus })
+            });
+            fetchOrders(); // Refresh orders from backend
+          } catch (error) {
+            console.error('Error updating order:', error);
+          }
+        };
+        updateBackend();
+        
+        setAlertConfig({ isOpen: false });
+        
+        // Show success message
+        setTimeout(() => {
+          setAlertConfig({
+            isOpen: true,
+            type: 'success',
+            title: 'Success!',
+            message: `Order successfully ${statusText}! Customer has been notified.`,
+            onClose: () => setAlertConfig({ isOpen: false })
+          });
+        }, 100);
+      },
+      onClose: () => setAlertConfig({ isOpen: false })
     });
   };
 
@@ -279,7 +372,9 @@ const PharmacistDashboard = () => {
                   <th>Customer</th>
                   <th>Quantity</th>
                   <th>Total</th>
+                  <th>Prescription</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -303,9 +398,49 @@ const PharmacistDashboard = () => {
                       <td>{order.quantity}</td>
                       <td>${order.totalPrice}</td>
                       <td>
+                        {order.prescription ? (
+                          <a href={order.prescription} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm">
+                            View
+                          </a>
+                        ) : (
+                          <span style={{color: '#999', fontSize: '12px'}}>No prescription</span>
+                        )}
+                      </td>
+                      <td>
                         <span className={`status-badge status-${order.status}`}>
                           {order.status}
                         </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          {order.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'confirmed')}
+                                className="btn btn-success btn-sm"
+                                title="Confirm Order"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'failed')}
+                                className="btn btn-danger btn-sm"
+                                title="Mark as Failed"
+                              >
+                                ✗
+                              </button>
+                            </>
+                          )}
+                          {order.status === 'confirmed' && (
+                            <button
+                              onClick={() => updateOrderStatus(order.id, 'delivered')}
+                              className="btn btn-primary btn-sm"
+                              title="Mark as Delivered"
+                            >
+                              📦
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -420,6 +555,15 @@ const PharmacistDashboard = () => {
             </div>
           </div>
         )}
+        
+        <ModernAlert
+          isOpen={alertConfig.isOpen}
+          type={alertConfig.type}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          onConfirm={alertConfig.onConfirm}
+          onClose={alertConfig.onClose}
+        />
       </div>
     </div>
   );

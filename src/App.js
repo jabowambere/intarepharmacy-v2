@@ -9,6 +9,7 @@ import Medicines from './pages/Medicines.jsx';
 import About from './pages/About.jsx';
 import Contact from './pages/Contact.jsx';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import './App.css';
 
 const ConditionalNavbar = () => {
@@ -20,6 +21,17 @@ const ConditionalNavbar = () => {
   }
   
   return <Navbar />;
+};
+
+const ConditionalFooter = () => {
+  const location = useLocation();
+  const isDashboard = location.pathname === '/admin' || location.pathname === '/pharmacist';
+  
+  if (isDashboard) {
+    return null;
+  }
+  
+  return <Footer />;
 };
 
 const PrivateRoute = ({ children, allowedRoles }) => {
@@ -71,6 +83,7 @@ function App() {
         <div className="App">
           <ConditionalNavbar />
           <AppRoutes />
+          <ConditionalFooter />
         </div>
       </Router>
     </AuthProvider>

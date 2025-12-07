@@ -3,24 +3,37 @@ import { useAuth } from '../context/AuthContext';
 import './PurchaseModal.css';
 
 const PurchaseModal = ({ medicine, onClose }) => {
-  const { setMedicines, setOrders } = useAuth();
+  const { setMedicines, setOrders, fetchMedicines } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     address: '',
     quantity: 1,
+    prescription: '',
   });
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    if (e.target.name === 'prescription' && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          prescription: reader.result,
+        });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.quantity > medicine.stock) {
@@ -28,36 +41,65 @@ const PurchaseModal = ({ medicine, onClose }) => {
       return;
     }
 
-    // Create order
-    const order = {
-      id: Date.now(),
-      medicineId: medicine.id,
-      medicineName: medicine.name,
-      quantity: parseInt(formData.quantity),
-      customerName: formData.name,
-      customerEmail: formData.email,
-      customerPhone: formData.phone,
-      customerAddress: formData.address,
-      totalPrice: (medicine.price * formData.quantity).toFixed(2),
-      date: new Date().toISOString(),
-      status: 'pending',
-    };
+    try {
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/purchases`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          medicineId: medicine.id,
+          medicineName: medicine.name,
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
+          customerAddress: formData.address,
+          quantity: parseInt(formData.quantity),
+          totalPrice: medicine.price * formData.quantity,
+          prescription: formData.prescription
+        })
+      });
 
-    setOrders(prev => [...prev, order]);
-
-    // Update stock
-    setMedicines(prev =>
-      prev.map(m =>
-        m.id === medicine.id
-          ? { ...m, stock: m.stock - parseInt(formData.quantity) }
-          : m
-      )
-    );
-
-    setSubmitted(true);
-    setTimeout(() => {
-      onClose();
-    }, 2000);
+      if (response.ok) {
+        fetchMedicines();
+        setSubmitted(true);
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Purchase failed');
+      }
+    } catch (error) {
+      console.error('Backend not available, using fallback:', error);
+      // Fallback to local state if backend is not available
+      const order = {
+        id: Date.now(),
+        medicineId: medicine.id,
+        medicineName: medicine.name,
+        quantity: parseInt(formData.quantity),
+        customerName: formData.name,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        customerAddress: formData.address,
+        totalPrice: (medicine.price * formData.quantity).toFixed(2),
+        status: 'pending',
+        prescription: formData.prescription
+      };
+      
+      setOrders(prev => [...prev, order]);
+      setMedicines(prev =>
+        prev.map(m =>
+          m.id === medicine.id
+            ? { ...m, stock: m.stock - parseInt(formData.quantity) }
+            : m
+        )
+      );
+      
+      setSubmitted(true);
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    }
   };
 
   if (submitted) {
@@ -147,6 +189,20 @@ const PurchaseModal = ({ medicine, onClose }) => {
               rows="3"
               placeholder="Enter your complete delivery address"
             />
+          </div>
+
+          <div className="form-group">
+            <label>Doctor's Prescription *</label>
+            <input
+              type="file"
+              name="prescription"
+              onChange={handleChange}
+              accept="image/*,.pdf"
+              required
+            />
+            <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+              Upload a clear image or PDF of your doctor's prescription
+            </small>
           </div>
 
           <div className="total-price">

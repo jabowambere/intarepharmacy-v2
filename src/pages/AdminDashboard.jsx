@@ -5,8 +5,10 @@ import StockAlerts from '../components/StockAlerts';
 import './Dashboard.css';
 
 const AdminDashboard = () => {
-  const { pharmacists, setPharmacists, medicines, getStockAlerts, user, logout } = useAuth();
+  const { pharmacists, setPharmacists, medicines, getStockAlerts, user, logout, fetchMedicines } = useAuth();
   const navigate = useNavigate();
+  const [contacts, setContacts] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   const handleLogout = () => {
     logout();
@@ -22,6 +24,34 @@ const AdminDashboard = () => {
   });
 
   const alerts = getStockAlerts();
+
+  // Fetch data from backend
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      try {
+        // Fetch contacts
+        const contactResponse = await fetch(`${apiUrl}/api/contact`);
+        if (contactResponse.ok) {
+          const contactData = await contactResponse.json();
+          setContacts(contactData);
+        }
+        
+        // Fetch orders
+        const orderResponse = await fetch(`${apiUrl}/api/purchases`);
+        if (orderResponse.ok) {
+          const orderData = await orderResponse.json();
+          setOrders(orderData);
+        }
+        
+        // Fetch medicines
+        fetchMedicines();
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+    fetchData();
+  }, [fetchMedicines]);
 
   // Calculate stock statistics
   const stockStats = {
@@ -107,7 +137,7 @@ const AdminDashboard = () => {
             <div className="user-logout-section">
               <span className="user-name-display">{user?.name}</span>
               <button onClick={handleLogout} className="btn-logout-dashboard">
-                <span className="logout-icon">🚪</span>
+                <span className="logout-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
                 Logout
               </button>
             </div>
@@ -231,6 +261,47 @@ const AdminDashboard = () => {
                           </button>
                         </div>
                       </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="dashboard-section">
+          <h2>Contact Messages</h2>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contacts.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="empty-state">
+                      No contact messages yet.
+                    </td>
+                  </tr>
+                ) : (
+                  contacts.map(contact => (
+                    <tr key={contact._id || contact.id}>
+                      <td>{contact.name}</td>
+                      <td>{contact.email}</td>
+                      <td>
+                        <div className="message-preview">
+                          {contact.message.length > 100 
+                            ? `${contact.message.substring(0, 100)}...` 
+                            : contact.message
+                          }
+                        </div>
+                      </td>
+                      <td>{contact.createdAt ? new Date(contact.createdAt).toLocaleDateString() : 'N/A'}</td>
                     </tr>
                   ))
                 )}

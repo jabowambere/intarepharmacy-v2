@@ -84,9 +84,8 @@ const Login = () => {
             </div>
 
             <div className="login-info">
-              <p><strong>Demo Credentials:</strong></p>
-              <p>Admin: admin@pharmacy.com / admin123</p>
-              <p>Pharmacist: Use any pharmacist email from the list / pharmacist123</p>
+              <p><strong>Don't have an account?</strong></p>
+              <p>Contact the Administrator</p>
             </div>
 
             <button type="submit" className="btn btn-primary btn-block">
