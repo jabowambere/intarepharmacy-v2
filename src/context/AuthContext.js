@@ -12,15 +12,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [medicines, setMedicines] = useState(() => {
-    const saved = localStorage.getItem('medicines');
-    return saved ? JSON.parse(saved) : [
-      { id: 1, name: 'Paracetamol 500mg', description: 'Pain reliever and fever reducer', price: 5.99, stock: 50, category: 'Pain Relief', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=300&fit=crop' },
-      { id: 2, name: 'Ibuprofen 200mg', description: 'Anti-inflammatory medication', price: 7.99, stock: 30, category: 'Pain Relief', image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop' },
-      { id: 3, name: 'Amoxicillin 250mg', description: 'Antibiotic for bacterial infections', price: 12.99, stock: 20, category: 'Antibiotic', image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=300&fit=crop' },
-      { id: 4, name: 'Vitamin D3 1000IU', description: 'Essential vitamin supplement', price: 9.99, stock: 100, category: 'Supplements', image: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&h=300&fit=crop' },
-    ];
-  });
+  const [medicines, setMedicines] = useState([]);
   const [pharmacists, setPharmacists] = useState(() => {
     const saved = localStorage.getItem('pharmacists');
     return saved ? JSON.parse(saved) : [
@@ -33,18 +25,16 @@ export const AuthProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Initialize admin user
+  // Initialize admin user and fetch medicines
   useEffect(() => {
     const adminUser = localStorage.getItem('adminUser');
     if (adminUser) {
       setUser(JSON.parse(adminUser));
     }
+    fetchMedicines();
   }, []);
 
-  // Save medicines to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('medicines', JSON.stringify(medicines));
-  }, [medicines]);
+
 
   // Save pharmacists to localStorage whenever they change
   useEffect(() => {

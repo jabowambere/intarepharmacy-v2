@@ -241,39 +241,40 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {pharmacists.length === 0 ? (
-                  <tr key="empty-pharmacists">
-                    <td colSpan="5" className="empty-state">
-                      No pharmacists found. Add one to get started.
-                    </td>
-                  </tr>
-                ) : (
-                  pharmacists.map(pharmacist => (
-                    <tr key={pharmacist.id}>
-                      <td>{pharmacist.name}</td>
-                      <td>{pharmacist.email}</td>
-                      <td>{pharmacist.phone}</td>
-                      <td>{pharmacist.license}</td>
-                      <td>
-                        <div className="action-buttons">
-                          <button
-                            onClick={() => handleEdit(pharmacist)}
-                            className="btn btn-secondary btn-sm"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(pharmacist.id)}
-                            className="btn btn-danger btn-sm"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
+  {pharmacists.length === 0 ? (
+    <tr key="empty-pharmacists">
+      <td colSpan="5" className="empty-state">
+        No pharmacists found. Add one to get started.
+      </td>
+    </tr>
+  ) : (
+    pharmacists.map(pharmacist => (
+      <tr key={pharmacist.id || pharmacist.email}>
+        <td>{pharmacist.name}</td>
+        <td>{pharmacist.email}</td>
+        <td>{pharmacist.phone}</td>
+        <td>{pharmacist.license}</td>
+        <td>
+          <div className="action-buttons">
+            <button
+              onClick={() => handleEdit(pharmacist)}
+              className="btn btn-secondary btn-sm"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => handleDelete(pharmacist.id)}
+              className="btn btn-danger btn-sm"
+            >
+              Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
             </table>
           </div>
         </div>
