@@ -81,3 +81,39 @@
   transform: none;
 }
 
+@media (max-width: 768px) {
+  .medicine-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .medicine-price {
+    font-size: 20px;
+    text-align: center;
+  }
+  
+  .btn-purchase {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .medicine-content {
+    padding: 16px;
+  }
+  
+  .medicine-name {
+    font-size: 18px;
+  }
+  
+  .medicine-description {
+    font-size: 13px;
+  }
+  
+  .medicine-image-container {
+    height: 180px;
+  }
+}
+

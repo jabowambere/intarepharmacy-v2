@@ -9,6 +9,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const alerts = getStockAlerts();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,11 +34,20 @@ const Navbar = () => {
           <span>Intare Pharmacy</span>
         </Link>
         
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/medicines" className="nav-link">Medicines</Link>
-          <Link to="/about" className="nav-link">About</Link>
-          <Link to="/contact" className="nav-link">Contact</Link>
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        
+        <div className={`navbar-links ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+          <Link to="/" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+          <Link to="/medicines" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Medicines</Link>
+          <Link to="/about" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+          <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
           
           {user ? (
             <>
@@ -47,18 +57,18 @@ const Navbar = () => {
                 </div>
               )}
               {user.role === 'admin' && (
-                <Link to="/admin" className="nav-link">Admin Dashboard</Link>
+                <Link to="/admin" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>
               )}
               {(user.role === 'pharmacist' || user.role === 'admin') && (
-                <Link to="/pharmacist" className="nav-link">Pharmacist Dashboard</Link>
+                <Link to="/pharmacist" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Pharmacist Dashboard</Link>
               )}
               <div className="user-info">
                 <span className="user-name">{user.name}</span>
-                <button onClick={handleLogout} className="btn-logout">Logout</button>
+                <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-logout">Logout</button>
               </div>
             </>
           ) : (
-            <Link to="/login" className="nav-link">Login</Link>
+            <Link to="/login" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
           )}
         </div>
       </div>

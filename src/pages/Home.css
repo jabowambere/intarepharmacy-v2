@@ -140,19 +140,20 @@
 
 @media (max-width: 768px) {
   .hero {
-    padding: 100px 0;
-    min-height: 500px;
+    padding: 80px 0;
+    min-height: 450px;
   }
   
   .hero-content {
     flex-direction: column;
-    gap: 40px;
+    gap: 30px;
     text-align: center;
+    padding: 0 20px;
   }
   
   .hero-avatar-img {
-    width: 250px;
-    height: 250px;
+    width: 200px;
+    height: 200px;
   }
   
   .hero-text {
@@ -160,19 +161,94 @@
   }
   
   .hero-title {
-    font-size: 40px;
+    font-size: 36px;
+    margin-bottom: 20px;
   }
   
   .hero-subtitle {
-    font-size: 18px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .about-section {
+    padding: 60px 0;
+  }
+  
+  .about-content h2 {
+    font-size: 28px;
+    margin-bottom: 32px;
   }
   
   .about-grid {
     grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .about-card {
+    padding: 24px;
+  }
+  
+  .medicines-section {
+    padding: 60px 0;
+  }
+  
+  .section-title {
+    font-size: 28px;
+    margin-bottom: 32px;
   }
   
   .medicines-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 60px 0;
+    min-height: 400px;
+  }
+  
+  .hero-content {
+    gap: 24px;
+    padding: 0 16px;
+  }
+  
+  .hero-avatar-img {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .hero-title {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  
+  .hero-subtitle {
+    font-size: 14px;
+  }
+  
+  .about-section,
+  .medicines-section {
+    padding: 40px 0;
+  }
+  
+  .about-content h2,
+  .section-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .about-card {
+    padding: 20px;
+  }
+  
+  .about-card h3 {
+    font-size: 20px;
+  }
+  
+  .about-icon {
+    font-size: 40px;
   }
 }
 

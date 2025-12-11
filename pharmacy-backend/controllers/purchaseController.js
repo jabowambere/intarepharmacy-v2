@@ -17,6 +17,50 @@ export const createPurchase = async (req, res) => {
     });
     
     await purchase.save();
+    
+    // Send order confirmation email
+    try {
+      const nodemailer = await import('nodemailer');
+      
+      const transporter = nodemailer.default.createTransport({
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'your-email@domain.com',
+          pass: process.env.BREVO_API_KEY
+        }
+      });
+      
+      const info = await transporter.sendMail({
+        from: `"Intare Pharmacy" <${process.env.FROM_EMAIL}>`,
+        to: customerEmail,
+        subject: 'Order Received - Intare Pharmacy',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #228B22;">Intare Pharmacy</h2>
+            <p>Dear ${customerName},</p>
+            <p>Thank you for your order! We have received your prescription and it is now being reviewed by our pharmacist.</p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>Order Details:</strong><br>
+              Order ID: #${purchase._id}<br>
+              Medicine: ${purchase.medicineName}<br>
+              Quantity: ${quantity}<br>
+              Total: $${purchase.totalPrice}<br>
+              Status: Pending Review
+            </div>
+            <p>You will receive another email once your prescription has been reviewed.</p>
+            <p>Best regards,<br>Intare Pharmacy Team</p>
+          </div>
+        `
+      });
+      
+      console.log('✅ Order confirmation email sent to:', customerEmail);
+      console.log('📧 Message ID:', info.messageId);
+    } catch (emailError) {
+      console.log('❌ Order confirmation email failed:', emailError.message);
+    }
+    
     res.status(201).json({ message: "Purchase successful", purchase });
   } catch (error) {
     console.error('Purchase error:', error);
@@ -52,27 +96,15 @@ export const updatePurchaseStatus = async (req, res) => {
     try {
       const nodemailer = await import('nodemailer');
       
-      // Use Ethereal for testing (creates test account automatically)
-      let transporter;
-      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        transporter = nodemailer.default.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-          }
-        });
-      } else {
-        // Fallback: Log email to console
-        console.log('\n=== EMAIL NOTIFICATION ===');
-        console.log(`To: ${purchase.customerEmail}`);
-        console.log(`Subject: Order ${status.charAt(0).toUpperCase() + status.slice(1)} - Intare Pharmacy`);
-        console.log(`Customer: ${purchase.customerName}`);
-        console.log(`Medicine: ${purchase.medicineName}`);
-        console.log(`Status: ${status}`);
-        console.log('========================\n');
-        return; // Skip actual email sending
-      }
+      const transporter = nodemailer.default.createTransport({
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'your-email@domain.com',
+          pass: process.env.BREVO_API_KEY
+        }
+      });
       
       const statusMessages = {
         confirmed: 'Your order has been confirmed and will be delivered soon.',
@@ -81,7 +113,7 @@ export const updatePurchaseStatus = async (req, res) => {
       };
       
       const info = await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+        from: `"Intare Pharmacy" <${process.env.FROM_EMAIL}>`,
         to: purchase.customerEmail,
         subject: `Order ${status.charAt(0).toUpperCase() + status.slice(1)} - Intare Pharmacy`,
         html: `
@@ -100,9 +132,19 @@ export const updatePurchaseStatus = async (req, res) => {
           </div>
         `
       });
-      console.log('Email sent successfully:', info.messageId);
+      
+      console.log('✅ Email sent successfully to:', purchase.customerEmail);
+      console.log('📧 Message ID:', info.messageId);
     } catch (emailError) {
-      console.log('Email sending failed (non-critical):', emailError.message);
+      console.log('❌ Email sending failed:', emailError.message);
+      // Fallback: Log email to console
+      console.log('\n=== EMAIL NOTIFICATION (FALLBACK) ===');
+      console.log(`To: ${purchase.customerEmail}`);
+      console.log(`Subject: Order ${status.charAt(0).toUpperCase() + status.slice(1)} - Intare Pharmacy`);
+      console.log(`Customer: ${purchase.customerName}`);
+      console.log(`Medicine: ${purchase.medicineName}`);
+      console.log(`Status: ${status}`);
+      console.log('=====================================\n');
     }
     
     res.json({ message: "Status updated successfully", purchase });

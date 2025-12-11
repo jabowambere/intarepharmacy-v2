@@ -78,3 +78,47 @@
   color: #333;
 }
 
+@media (max-width: 768px) {
+  .login-page {
+    padding: 20px 16px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .login-card {
+    padding: 30px 24px;
+  }
+  
+  .login-header h1 {
+    font-size: 28px;
+  }
+  
+  .login-header p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 16px 12px;
+  }
+  
+  .login-card {
+    padding: 24px 20px;
+  }
+  
+  .login-header h1 {
+    font-size: 24px;
+  }
+  
+  .login-info {
+    padding: 12px;
+    font-size: 13px;
+  }
+  
+  .form-group input,
+  .form-select {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
