@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Loader from '../components/Loader';
 import PageTransition from '../components/PageTransition';
 import './Contact.css';
-
+import {MapPin, Phone, Mail, Clock} from "lucide-react";
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -48,22 +48,30 @@ const Contact = () => {
         <div className="contact-content">
           <div className="contact-info">
             <div className="info-card">
-              <div className="info-icon">📍</div>
+              <div className="info-icon">
+              <MapPin size={24} />
+              </div>
               <h3>Address</h3>
               <p>123 Healthcare Street<br />Medical District, City 12345</p>
             </div>
             <div className="info-card">
-              <div className="info-icon">📞</div>
+              <div className="info-icon">
+                <Phone size={24} />
+              </div>
               <h3>Phone</h3>
               <p>+1 (555) 123-4567<br />+1 (555) 123-4568</p>
             </div>
             <div className="info-card">
-              <div className="info-icon">✉️</div>
+              <div className="info-icon">
+                <Mail size={24} />
+              </div>
               <h3>Email</h3>
               <p>info@intarepharmacy.com<br />support@intarepharmacy.com</p>
             </div>
             <div className="info-card">
-              <div className="info-icon">🕒</div>
+              <div className="info-icon">
+                <Clock size={24} />
+              </div>
               <h3>Hours</h3>
               <p>Monday - Friday: 8:00 AM - 8:00 PM<br />Saturday - Sunday: 9:00 AM - 6:00 PM</p>
             </div>

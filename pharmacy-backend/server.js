@@ -7,6 +7,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import medicineRoutes from "./routes/medicineRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import purchaseRoutes from "./routes/purchaseRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/medicines", medicineRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/purchases", purchaseRoutes);
+app.use("/api", appointmentRoutes);
 
 app.get("/", (req, res) =>{
     res.send("Pharmacy backend running...");

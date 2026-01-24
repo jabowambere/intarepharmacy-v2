@@ -1,6 +1,6 @@
 import React from 'react';
 import './Footer.css';
-
+import { Mail, Phone } from "lucide-react";
 const Footer = () => {
   return (
     <footer className="footer">
@@ -12,8 +12,15 @@ const Footer = () => {
           </div>
           <div className="footer-section">
             <h4>Contact</h4>
-            <p>📞 +250 788462227</p>
-            <p>📧 info@intarepharmacy.com</p>
+            <div className="contact-item">
+  <Mail size={20} />
+  <span> intarepharmacy@gmail.com</span>
+</div>
+
+<div className="contact-item">
+  <Phone size={20} />
+  <span> +250 788462227</span>
+</div>
           </div>
           <div className="footer-section">
             <h4>Hours</h4>

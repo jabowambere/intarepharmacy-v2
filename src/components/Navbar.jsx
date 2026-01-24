@@ -46,9 +46,9 @@ const Navbar = () => {
         <div className={`navbar-links ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
           <Link to="/" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
           <Link to="/medicines" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Medicines</Link>
+          <Link to="/appointment" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Book an Appointment</Link>
           <Link to="/about" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
-          <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
-          
+          <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>          
           {user ? (
             <>
               {alerts.length > 0 && (

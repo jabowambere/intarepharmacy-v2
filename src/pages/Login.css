@@ -4,6 +4,10 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eaf3ea 0%, #f9faf9 100%);
   padding: 40px 20px;
 }
 

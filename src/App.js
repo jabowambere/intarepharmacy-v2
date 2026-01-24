@@ -8,6 +8,7 @@ import PharmacistDashboard from './pages/PharmacistDashboard.jsx';
 import Medicines from './pages/Medicines.jsx';
 import About from './pages/About.jsx';
 import Contact from './pages/Contact.jsx';
+import Appointment from './pages/Appointment.jsx';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -56,6 +57,7 @@ function AppRoutes() {
       <Route path="/medicines" element={<Medicines />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/appointment" element={<Appointment />} />
       <Route path="/login" element={<Login />} />
       <Route
         path="/admin"

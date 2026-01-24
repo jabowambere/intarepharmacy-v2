@@ -6,6 +6,12 @@ import Loader from '../components/Loader';
 import PageTransition from '../components/PageTransition';
 import avatarImg from './avatar.png';
 import './Home.css';
+import {
+  Stethoscope,
+  Pill,
+  Truck,
+  BadgeDollarSign
+} from "lucide-react";
 
 const Home = () => {
   const { medicines, getStockAlerts, fetchMedicines } = useAuth();
@@ -49,22 +55,29 @@ const Home = () => {
             <h2>About Our Pharmacy</h2>
             <div className="about-grid">
               <div className="about-card">
-                <div className="about-icon">🏥</div>
+                <div className="about-icon">
+                  <Stethoscope size={32}/>
+                </div>
                 <h3>Professional Service</h3>
                 <p>Our licensed pharmacists provide expert consultation and medication management services.</p>
               </div>
               <div className="about-card">
-                <div className="about-icon">💊</div>
+                <div className="about-icon">
+                  <Pill size={32}/>                </div>
                 <h3>Quality Medicines</h3>
                 <p>We stock only FDA-approved medications from trusted manufacturers.</p>
               </div>
               <div className="about-card">
-                <div className="about-icon">🚚</div>
+                <div className="about-icon">
+                  <Truck size={32}/>
+                </div>
                 <h3>Fast Delivery</h3>
                 <p>We offer convenient home delivery service for all your medication needs.</p>
               </div>
               <div className="about-card">
-                <div className="about-icon">💰</div>
+                <div className="about-icon">
+                  <BadgeDollarSign size={32}/>
+                </div>
                 <h3>Affordable Prices</h3>
                 <p>Competitive pricing with special discounts for regular customers.</p>
               </div>
