@@ -10,13 +10,53 @@ import {
   Stethoscope,
   Pill,
   Truck,
-  BadgeDollarSign
+  BadgeDollarSign,
+  ChevronDown,
+  Star
 } from "lucide-react";
 
 const Home = () => {
   const { medicines, getStockAlerts, fetchMedicines } = useAuth();
   const alerts = getStockAlerts();
   const [loading, setLoading] = useState(true);
+  const [openFaq, setOpenFaq] = useState(null);
+
+  const faqs = [
+    {
+      question: "How do I place an order?",
+      answer: "Simply browse our medicines, click on the one you need, and follow the purchase process. You'll need to provide your details and delivery address."
+    },
+    {
+      question: "Do you require prescriptions?",
+      answer: "For prescription medications, yes. You can upload your prescription during the ordering process. Over-the-counter medicines don't require prescriptions."
+    },
+    {
+      question: "What are your delivery times?",
+      answer: "We offer same-day delivery within the city and 1-2 business days for other areas. Emergency medications can be delivered within 2 hours."
+    },
+    {
+      question: "Are your medicines authentic?",
+      answer: "Yes, all our medicines are sourced directly from licensed manufacturers and distributors. We guarantee 100% authentic medications."
+    }
+  ];
+
+  const reviews = [
+    {
+      name: "Sarah Johnson",
+      rating: 5,
+      comment: "Excellent service! Fast delivery and genuine medicines. Highly recommended."
+    },
+    {
+      name: "Michael Brown",
+      rating: 5,
+      comment: "Professional staff and great customer service. They always have what I need."
+    },
+    {
+      name: "Emily Davis",
+      rating: 4,
+      comment: "Good quality medicines at affordable prices. Very satisfied with their service."
+    }
+  ];
 
   useEffect(() => {
     const loadData = async () => {
@@ -93,6 +133,53 @@ const Home = () => {
           <div className="medicines-grid">
             {medicines.map(medicine => (
               <MedicineCard key={medicine.id} medicine={medicine} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="faq-section">
+        <div className="container">
+          <h2 className="section-title">Frequently Asked Questions</h2>
+          <div className="faq-container">
+            {faqs.map((faq, index) => (
+              <div key={index} className="faq-item">
+                <button 
+                  className="faq-question"
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                >
+                  {faq.question}
+                  <ChevronDown className={`faq-icon ${openFaq === index ? 'open' : ''}`} size={20} />
+                </button>
+                {openFaq === index && (
+                  <div className="faq-answer">
+                    <p>{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="reviews-section">
+        <div className="container">
+          <h2 className="section-title">What Our Customers Say</h2>
+          <div className="reviews-grid">
+            {reviews.map((review, index) => (
+              <div key={index} className="review-card">
+                <div className="review-stars">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      size={16} 
+                      className={i < review.rating ? 'star-filled' : 'star-empty'} 
+                    />
+                  ))}
+                </div>
+                <p className="review-comment">"{review.comment}"</p>
+                <p className="review-author">- {review.name}</p>
+              </div>
             ))}
           </div>
         </div>

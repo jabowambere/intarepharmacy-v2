@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "concurrently \"mongod --dbpath C:\\data\\db\" \"node server.js\"",
     "dev": "nodemon server.js"
   },
   "devDependencies": {
@@ -12,7 +12,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.0",
     "nodemailer": "^7.0.11"
   }

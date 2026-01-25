@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Loader from '../components/Loader';
 import PageTransition from '../components/PageTransition';
 import './About.css';
-
+import {
+  Stethoscope,
+  Pill,
+  Truck,
+  BadgeDollarSign,
+  Phone,
+  Lock
+} from "lucide-react";
 const About = () => {
   const [loading, setLoading] = useState(true);
 
@@ -39,32 +46,44 @@ const About = () => {
             <h2>Why Choose Us</h2>
             <div className="features-grid">
               <div className="feature-card">
-                <div className="feature-icon">🏥</div>
+                <div className="feature-icon">
+                  <Stethoscope size={28}/>
+                </div>
                 <h3>Licensed Professionals</h3>
                 <p>Our team consists of certified pharmacists with years of experience in pharmaceutical care.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">💊</div>
+                <div className="feature-icon">
+                  <Pill size={28}/>
+                </div>
                 <h3>Quality Assurance</h3>
                 <p>All medications are sourced from verified suppliers and meet the highest quality standards.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🚚</div>
+                <div className="feature-icon">
+                  <Truck size={28}/>
+                </div>
                 <h3>Fast Delivery</h3>
                 <p>We offer reliable and timely delivery services to your doorstep for your convenience.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">💰</div>
+                <div className="feature-icon">
+                  <BadgeDollarSign size={28}/>
+                </div>
                 <h3>Affordable Prices</h3>
                 <p>Competitive pricing with special discounts and loyalty programs for our customers.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">📞</div>
+                <div className="feature-icon">
+                  <Phone size={28}/>
+                </div>
                 <h3>24/7 Support</h3>
                 <p>Our customer service team is always ready to assist you with any questions or concerns.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🔒</div>
+                <div className="feature-icon">
+                  <Lock size={28}/>
+                </div>
                 <h3>Secure & Safe</h3>
                 <p>Your privacy and security are our top priorities. All transactions are secure and confidential.</p>
               </div>

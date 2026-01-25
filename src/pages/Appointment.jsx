@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Appointment.css';
 import appImg from './appointment.png';
+import Loader from '../components/Loader';
 
 const Appointment = () => {
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     patientName: '',
     email: '',
@@ -14,6 +16,10 @@ const Appointment = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
 
   const timeSlots = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -72,6 +78,8 @@ const Appointment = () => {
   };
 
   const today = new Date().toISOString().split('T')[0];
+
+  if (loading) return <Loader />;
 
   return (
     <div className="appointment-container">

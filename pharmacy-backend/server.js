@@ -23,7 +23,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/medicines", medicineRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/purchases", purchaseRoutes);
-app.use("/api", appointmentRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
 app.get("/", (req, res) =>{
     res.send("Pharmacy backend running...");
