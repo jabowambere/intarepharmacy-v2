@@ -9,6 +9,10 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendOrderStatusEmail = async (customerEmail, customerName, medicineName, status, orderId) => {
+  // Email functionality disabled - would need proper credentials
+  console.log(`📧 Email notification (disabled): ${status} order for ${medicineName} to ${customerEmail}`);
+  return;
+  
   const statusMessages = {
     confirmed: {
       subject: 'Order Confirmed - Intare Pharmacy',

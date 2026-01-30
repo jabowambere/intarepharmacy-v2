@@ -7,8 +7,9 @@ import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-// user must be logged in
-router.post("/", auth, createAppointment);
+// Public route - no auth required for booking
+router.post("/", createAppointment);
+// Admin only - auth required for viewing appointments
 router.get("/", auth, getAppointments);
 
 export default router;

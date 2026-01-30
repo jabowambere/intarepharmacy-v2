@@ -79,7 +79,11 @@ const Home = () => {
               <img src={avatarImg} alt="Healthcare Professional" className="hero-avatar-img" />
             </div>
             <div className="hero-text">
-              <h1 className="hero-title">What if healthcare felt simpler?</h1>
+            <div className="wave-containter">
+              <h1 className="wave-text">
+<span>What&nbsp;</span><span>if&nbsp;</span><span>healthcare&nbsp;</span><span>felt&nbsp;</span><span>simpler?</span>
+                </h1>
+            </div>
               <p className="hero-subtitle">
                 Intare Pharmacy-your trusted partner in healthcare. We provide quality medicines and 
                 professional pharmaceutical services to ensure your well-being.
