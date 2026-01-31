@@ -25,6 +25,7 @@ const PharmacistDashboard = () => {
     category: 'Pain Relief',
     image: '',
   });
+  const [appointments, setAppointments] = useState([]);
   const [alertConfig, setAlertConfig] = useState({ isOpen: false });
   const [loading, setLoading] = useState(true);
 
@@ -54,11 +55,38 @@ const PharmacistDashboard = () => {
     }
   };
 
+  // Fetch appointments from backend
+  const fetchAppointments = async () => {
+    try {
+      console.log('📅 Fetching appointments...');
+      const apiUrl = 'http://localhost:5000';
+      const token = localStorage.getItem('token');
+      console.log('🔑 Token:', token ? 'Present' : 'Missing');
+      console.log('🌐 API URL:', `${apiUrl}/api/appointments`);
+      
+      const response = await fetch(`${apiUrl}/api/appointments`);
+      
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response ok:', response.ok);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📅 Appointments data:', data);
+        setAppointments(data);
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Failed to fetch appointments:', response.status, errorText);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching appointments:', error);
+    }
+  };
+
   // Fetch data on component mount
   React.useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchMedicines(), fetchOrders()]);
+      await Promise.all([fetchMedicines(), fetchOrders(), fetchAppointments()]);
       setTimeout(() => setLoading(false), 1000);
     };
     loadData();
@@ -168,6 +196,31 @@ const PharmacistDashboard = () => {
       category: 'Pain Relief',
       image: '',
     });
+  };
+
+  const updateAppointmentStatus = async (appointmentId, newStatus) => {
+    try {
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      await fetch(`${apiUrl}/api/appointments/${appointmentId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      fetchAppointments(); // Refresh appointments
+      
+      setAlertConfig({
+        isOpen: true,
+        type: 'success',
+        title: 'Success!',
+        message: `Appointment ${newStatus.toLowerCase()} successfully!`,
+        onClose: () => setAlertConfig({ isOpen: false })
+      });
+    } catch (error) {
+      console.error('Error updating appointment:', error);
+    }
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
@@ -361,6 +414,83 @@ const PharmacistDashboard = () => {
                           >
                             Delete
                           </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="dashboard-section">
+          <h2>Appointments</h2>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Patient Details</th>
+                  <th>Appointment</th>
+                  <th>Consultation</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="empty-state">
+                      No appointments yet.
+                    </td>
+                  </tr>
+                ) : (
+                  appointments.map(appointment => (
+                    <tr key={appointment._id}>
+                      <td>
+                        <div>
+                          <div><strong>{appointment.patientName}</strong></div>
+                          <div className="order-detail-small">{appointment.email}</div>
+                          <div className="order-detail-small">{appointment.phone}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div>
+                          <div><strong>{new Date(appointment.appointmentDate).toLocaleDateString()}</strong></div>
+                          <div className="order-detail-small">{appointment.appointmentTime}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div>
+                          <div><strong>{appointment.consultationType}</strong></div>
+                          <div className="order-detail-small">{appointment.symptoms || 'No symptoms provided'}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`status-badge status-${appointment.status.toLowerCase()}`}>
+                          {appointment.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          {appointment.status === 'Pending' && (
+                            <>
+                              <button
+                                onClick={() => updateAppointmentStatus(appointment._id, 'Confirmed')}
+                                className="btn btn-success btn-sm"
+                                title="Approve Appointment"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                onClick={() => updateAppointmentStatus(appointment._id, 'Cancelled')}
+                                className="btn btn-danger btn-sm"
+                                title="Reject Appointment"
+                              >
+                                ✗
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
