@@ -18,7 +18,9 @@ export const submitContact = async (req, res) => {
         auth: {
           user: process.env.BREVO_LOGIN_EMAIL,
           pass: process.env.BREVO_SMTP_PASSWORD
-        }
+        },
+        debug: true,
+        logger: true
       });
       
       // Send notification to admin

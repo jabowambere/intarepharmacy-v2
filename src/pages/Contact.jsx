@@ -12,6 +12,8 @@ const Contact = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1200);
@@ -24,14 +26,41 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, this would send data to a backend
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: '', email: '', phone: '', message: '' });
-    }, 3000);
+    setIsSubmitting(true);
+    setError('');
+    
+    try {
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
+        }),
+      });
+      
+      if (response.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setFormData({ name: '', email: '', phone: '', message: '' });
+        }, 5000);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Contact form error:', error);
+      setError('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) return <Loader />;
@@ -82,10 +111,15 @@ const Contact = () => {
             {submitted ? (
               <div className="success-message">
                 <div className="success-icon">✓</div>
-                <p>Thank you! Your message has been sent successfully.</p>
+                <p>Thank you! Your message has been sent successfully. We'll get back to you within 24 hours.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="contact-form">
+                {error && (
+                  <div className="error-message" style={{color: 'red', marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#ffe6e6', borderRadius: '4px'}}>
+                    {error}
+                  </div>
+                )}
                 <div className="form-group">
                   <label>Full Name *</label>
                   <input
@@ -133,8 +167,8 @@ const Contact = () => {
                   />
                 </div>
 
-                <button type="submit" className="btn btn-primary btn-block">
-                  Send Message
+                <button type="submit" className="btn btn-primary btn-block" disabled={isSubmitting}>
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}
